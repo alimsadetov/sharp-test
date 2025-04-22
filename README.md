@@ -29,9 +29,10 @@ npm run docker:deploy
 ## Пример работы
 
 Исходное изображение:
-![Example Image](/.example.jpg)
+![Example Image](./example.jpg)
 
 После обработки получаем 4 части:
+
 ![Part 1](./images/1.png) | ![Part 2](./images/2.png)
 ![Part 4](./images/4.png) | ![Part 3](./images/3.png)
 
