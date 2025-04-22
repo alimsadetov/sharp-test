@@ -9,8 +9,11 @@ import { BLUR_STRENGTH, IMAGES_DIR } from '@/config/global.config';
 @Injectable()
 export class BlurService {
   private readonly blurSize = 20;
-  constructor(private readonly logger: CustomLoggerService, private readonly configService: ConfigService) {
-    this.logger.setContext('BlurService')
+  constructor(
+    private readonly logger: CustomLoggerService,
+    private readonly configService: ConfigService,
+  ) {
+    this.logger.setContext('BlurService');
   }
 
   async blurEdges(partNumber: number): Promise<string> {
@@ -18,8 +21,11 @@ export class BlurService {
       throw new Error('partNumber должен быть от 1 до 4');
     }
 
-    const imagePath = path.join(this.configService.get(IMAGES_DIR), `${partNumber}.png`);
-    
+    const imagePath = path.join(
+      this.configService.get(IMAGES_DIR),
+      `${partNumber}.png`,
+    );
+
     if (!fs.existsSync(imagePath)) {
       throw new Error(`Изображение ${partNumber}.png не найдено`);
     }
@@ -38,10 +44,12 @@ export class BlurService {
       metadata.height,
       edges,
     );
-    this.logger.log(`К изображению ${partNumber}.png применён блюр по линии разреза.`)
+    this.logger.log(
+      `К изображению ${partNumber}.png применён блюр по линии разреза.`,
+    );
 
     await blurredImage.toFile(imagePath);
-    this.logger.log(`Изображение ${partNumber}.png с блюром сохранено.`)
+    this.logger.log(`Изображение ${partNumber}.png с блюром сохранено.`);
     return imagePath;
   }
 
@@ -52,11 +60,16 @@ export class BlurService {
     left: boolean;
   } {
     switch (partNumber) {
-      case 1: return { top: false, right: true, bottom: true, left: false };
-      case 2: return { top: false, right: false, bottom: true, left: true };
-      case 3: return { top: true, right: false, bottom: false, left: true };
-      case 4: return { top: true, right: true, bottom: false, left: false };
-      default: throw new Error('Invalid partNumber');
+      case 1:
+        return { top: false, right: true, bottom: true, left: false };
+      case 2:
+        return { top: false, right: false, bottom: true, left: true };
+      case 3:
+        return { top: true, right: false, bottom: false, left: true };
+      case 4:
+        return { top: true, right: true, bottom: false, left: false };
+      default:
+        throw new Error('Invalid partNumber');
     }
   }
 
@@ -67,7 +80,7 @@ export class BlurService {
     edges: { top: boolean; right: boolean; bottom: boolean; left: boolean },
   ): Promise<sharp.Sharp> {
     const composites = [];
-  
+
     if (edges.top) {
       const topBlur = await image
         .clone()
@@ -76,43 +89,43 @@ export class BlurService {
         .toBuffer();
       composites.push({ input: topBlur, top: 0, left: 0 });
     }
-  
+
     if (edges.right) {
       const rightBlur = await image
         .clone()
-        .extract({ 
-          left: width - this.blurSize, 
-          top: 0, 
-          width: this.blurSize, 
-          height 
+        .extract({
+          left: width - this.blurSize,
+          top: 0,
+          width: this.blurSize,
+          height,
         })
         .blur(this.configService.get(BLUR_STRENGTH))
         .toBuffer();
-      composites.push({ 
-        input: rightBlur, 
-        top: 0, 
-        left: width - this.blurSize 
+      composites.push({
+        input: rightBlur,
+        top: 0,
+        left: width - this.blurSize,
       });
     }
-  
+
     if (edges.bottom) {
       const bottomBlur = await image
         .clone()
-        .extract({ 
-          left: 0, 
-          top: height - this.blurSize, 
-          width, 
-          height: this.blurSize 
+        .extract({
+          left: 0,
+          top: height - this.blurSize,
+          width,
+          height: this.blurSize,
         })
         .blur(this.configService.get(BLUR_STRENGTH))
         .toBuffer();
-      composites.push({ 
-        input: bottomBlur, 
-        top: height - this.blurSize, 
-        left: 0 
+      composites.push({
+        input: bottomBlur,
+        top: height - this.blurSize,
+        left: 0,
       });
     }
-  
+
     if (edges.left) {
       const leftBlur = await image
         .clone()
@@ -121,8 +134,7 @@ export class BlurService {
         .toBuffer();
       composites.push({ input: leftBlur, top: 0, left: 0 });
     }
-  
-    return sharp(await image.toBuffer())
-      .composite(composites);
+
+    return sharp(await image.toBuffer()).composite(composites);
   }
 }

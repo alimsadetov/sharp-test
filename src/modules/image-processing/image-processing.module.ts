@@ -9,4 +9,4 @@ import { SplitService } from './services/split.service';
   controllers: [ImageProcessingController],
   providers: [ImageProcessingService, BlurService, MergeService, SplitService],
 })
-export class ImageProcessingModule {} 
+export class ImageProcessingModule {}
